@@ -6,7 +6,6 @@ class UserService {
     async getUsers() {
         try {
             const data = await this._model.find()
-            console.log(data)
             return data.data
         } catch (error) {
             console.log(error)
