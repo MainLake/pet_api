@@ -1,3 +1,8 @@
+const express = require('express')
+const { validatorSyntaxJSON } = require('../middlewares/validatorSyntaxBody')
+const { validatorJsonVoid } = require('../middlewares/validatorJsonVoid')
+const errorMiddleware = require('../middlewares/errorMiddleware')
+
 class App {
     constructor(mongooseClient, serverExpress, dataConfig, routerIndex, morgan) {
         this._mongooseClient = mongooseClient
@@ -10,16 +15,24 @@ class App {
     }
 
     initializer() {
-        this.middlewares()
+
+        this.middlewaresStart()
         this.configRoutes()
+        this.middlewaresEnd()
     }
 
     configRoutes() {
         this._serverExpress.use('/api/v1', this._routerIndex)
     }
 
-    middlewares() {
+    middlewaresStart() {
+        this._serverExpress.use(express.json())
+        this._serverExpress.use(validatorSyntaxJSON)
+        this._serverExpress.use(validatorJsonVoid)
         this._serverExpress.use(this._morgan('tiny'))
+    }
+    middlewaresEnd() {
+        this._serverExpress.use(errorMiddleware)
     }
 
     runserver() {
